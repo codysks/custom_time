@@ -146,9 +146,13 @@ int main(void) {
 		++section; test_number = 0;
 		Time p1{TIME_UTC};
 		pt(p1);
+		struct timespec nsleepfor;
+		nsleepfor.tv_sec = 0;
+		nsleepfor.tv_nsec = 333333333;
 		while (p1.ffwdcmpnow(5, 0)) {
 			pt(Time{TIME_UTC});
-			sleep(1);
+			std::cerr << "Sleeping for 333333333 nseconds" << std::endl;
+			nanosleep(&nsleepfor, nullptr);
 		}
 	}
 	return EXIT_SUCCESS;
