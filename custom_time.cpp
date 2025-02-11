@@ -3,7 +3,7 @@
 #include <utility>
 #include <stdexcept>
 
-Time::Time(void) { Time(0, 0); }
+Time::Time(void) : Time(0, 0) {}
 Time::Time([[maybe_unused]] decltype(TIME_UTC) time_utc) { set(); }
 Time::Time(time_t seconds, long nseconds) { _t.tv_sec = seconds; _t.tv_nsec = nseconds; }
 Time::Time(struct timespec const& ts) : _t(ts) {}
