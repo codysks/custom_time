@@ -123,6 +123,10 @@ Time Time::absdiff(Time const& other) const {
 	return ret;
 }
 
+Time Time::time_elapsed(void) const {
+	return absdiff(Time{TIME_UTC});
+}
+
 bool Time::carry_once_sub(void) {
 	if (_t.tv_nsec < nsecond_lower_bound) {
 		_t.tv_nsec += nsecond_to_second_ratio;
