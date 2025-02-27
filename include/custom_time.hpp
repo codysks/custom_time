@@ -43,7 +43,7 @@ class Time {
  */
 		bool ffwdcmpnow(time_t seconds, long nseconds = 0) const;
 
-		Time absdiff(Time const &other) const;
+		[[nodiscard]] Time absdiff(Time const &other) const;
 
 	private:
 /*
