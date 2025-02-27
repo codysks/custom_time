@@ -28,7 +28,7 @@ class Time {
 		Time& set(struct timespec&& ts);
 		Time& set(Time const& t);
 		Time& set(Time&& t);
-		Time& set(void);
+		Time& set(void) noexcept;
 		Time& rewind(time_t seconds, long nseconds = 0);
 		Time& fforward(time_t seconds, long nseconds = 0);
 		[[nodiscard]] Time futureby(time_t seconds, long nseconds = 0) const;
@@ -43,7 +43,18 @@ class Time {
  */
 		bool ffwdcmpnow(time_t seconds, long nseconds = 0) const;
 
+		[[nodiscard]] Time absdiff(Time const &other) const noexcept;
+		[[nodiscard]] Time time_elapsed(void) const noexcept;
+
 	private:
+/*
+ *  Unchecked variant of set. This may cause the state of the object
+ *  to become invalid without throwing any exceptions or indicate any
+ *  errors.
+ */
+		void fset(time_t second, long nseconds = 0) noexcept;
+		bool carry_once_sub(void);
+		bool carry_once_add(void);
 		struct timespec _t;
 };
 

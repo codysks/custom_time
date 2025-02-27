@@ -3,7 +3,7 @@
 #include <utility>
 #include <stdexcept>
 
-Time::Time(void) : Time(0, 0) {}
+Time::Time(void) {}
 Time::Time([[maybe_unused]] decltype(TIME_UTC) time_utc) { set(); }
 Time::Time(time_t seconds, long nseconds) { _t.tv_sec = seconds; _t.tv_nsec = nseconds; }
 Time::Time(struct timespec const& ts) : _t(ts) {}
@@ -49,7 +49,7 @@ bool Time::operator>(Time const& rhs) const {
 	return !operator<=(rhs);
 }
 double Time::as_double(void) const {
-	return (double)_t.tv_sec + (double)_t.tv_nsec / (999999999 + 1);
+	return (double)_t.tv_sec + (double)_t.tv_nsec / (nsecond_to_second_ratio);
 }
 
 time_t Time::second(void) const { return _t.tv_sec; }
@@ -96,7 +96,7 @@ Time Time::futureby(time_t seconds, long nseconds) const {
 Time& Time::fforward(time_t seconds, long nseconds)
 	{ _t = futureby(seconds, nseconds)._t; return *this; }
 
-Time& Time::set(void) {
+Time& Time::set(void) noexcept {
 	timespec_get(&_t, TIME_UTC);
 	return *this;
 }
@@ -108,4 +108,48 @@ Time& Time::set(Time&& t) { _t = t._t; return *this; }
 
 bool Time::ffwdcmpnow(time_t seconds, long nseconds) const {
 	return futureby(seconds, nseconds) > Time{TIME_UTC};
+}
+
+Time Time::absdiff(Time const& other) const noexcept {
+	Time ret;
+	if (*this > other) {
+		ret.fset(this->_t.tv_sec - other._t.tv_sec, this->_t.tv_nsec - other._t.tv_nsec);
+		ret.carry_once_sub();
+	} else {
+		ret.fset(other._t.tv_sec - this->_t.tv_sec, other._t.tv_nsec - this->_t.tv_nsec);
+		ret.carry_once_sub();
+	}
+
+	return ret;
+}
+
+Time Time::time_elapsed(void) const noexcept {
+	return absdiff(Time{TIME_UTC});
+}
+
+bool Time::carry_once_sub(void) {
+	if (_t.tv_nsec < nsecond_lower_bound) {
+		_t.tv_nsec += nsecond_to_second_ratio;
+		if (__builtin_sub_overflow(_t.tv_sec, 1, &_t.tv_sec)) {
+			throw std::exception();
+		}
+		return true;
+	}
+	return false;
+}
+
+bool Time::carry_once_add(void) {
+	if (_t.tv_nsec > nsecond_upper_bound) {
+		_t.tv_nsec -= nsecond_to_second_ratio;
+		if (__builtin_add_overflow(_t.tv_sec, 1, &_t.tv_sec)) {
+			throw std::exception();
+		}
+		return true;
+	}
+	return false;
+}
+
+void Time::fset(time_t seconds, long nseconds) noexcept {
+	_t.tv_sec = seconds;
+	_t.tv_nsec = nseconds;
 }

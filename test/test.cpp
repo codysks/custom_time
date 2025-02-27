@@ -155,5 +155,23 @@ int main(void) {
 			nanosleep(&nsleepfor, nullptr);
 		}
 	}
+// Time arithmetic functions
+	{
+		++section; test_number = 0;
+		Time tbase{200, 500000000};
+		{
+		Time t1{100, 499999999};
+		assert(tbase.absdiff(t1) == Time(100, 1));
+		}
+		{
+		Time t1{100, 500000001};
+		assert(tbase.absdiff(t1) == Time(99, 999999999));
+		}
+		Time tnow{TIME_UTC};
+		sleep(1);
+		auto t_one_second_later = tnow.time_elapsed();
+		pt(t_one_second_later);
+		std::cerr << "as double: " << t_one_second_later.as_double() << std::endl;
+	}
 	return EXIT_SUCCESS;
 }
