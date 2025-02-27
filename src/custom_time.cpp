@@ -49,7 +49,7 @@ bool Time::operator>(Time const& rhs) const {
 	return !operator<=(rhs);
 }
 double Time::as_double(void) const {
-	return (double)_t.tv_sec + (double)_t.tv_nsec / (999999999 + 1);
+	return (double)_t.tv_sec + (double)_t.tv_nsec / (nsecond_to_second_ratio);
 }
 
 time_t Time::second(void) const { return _t.tv_sec; }
