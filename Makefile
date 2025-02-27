@@ -1,8 +1,21 @@
-CXX = c++
-CXXSTDLANG = -std=c++11
-CXXFLAGS = -Wall -Werror -Wextra -O3
+SHELL = /bin/bash
 
-custom_time.cpp.o: custom_time.cpp
-	$(CXX) $(CXXSTDLANG) $(CXXFLAGS) -c -o $@ $<
-test: test.cpp custom_time.cpp.o
-	 $(CXX) $(CXXSTDLANG) $(CXXFLAGS) -o $@ $^
+TEST_TARGETS = test
+TEST_DIR = test
+.PHONY: all
+all:
+	$(MAKE) -C src
+	$(MAKE) libcustom_time.a
+	$(MAKE) -C test
+
+libcustom_time.a:
+	ar rcs $@ src/*.o
+.PHONY: test
+test:
+	$(MAKE) all
+	./test/test && echo test passed
+.PHONY: clean
+clean:
+	$(MAKE) -C src clean
+	$(MAKE) -C test clean
+	rm -f *.a
