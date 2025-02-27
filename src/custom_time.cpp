@@ -96,7 +96,7 @@ Time Time::futureby(time_t seconds, long nseconds) const {
 Time& Time::fforward(time_t seconds, long nseconds)
 	{ _t = futureby(seconds, nseconds)._t; return *this; }
 
-Time& Time::set(void) {
+Time& Time::set(void) noexcept {
 	timespec_get(&_t, TIME_UTC);
 	return *this;
 }
@@ -110,7 +110,7 @@ bool Time::ffwdcmpnow(time_t seconds, long nseconds) const {
 	return futureby(seconds, nseconds) > Time{TIME_UTC};
 }
 
-Time Time::absdiff(Time const& other) const {
+Time Time::absdiff(Time const& other) const noexcept {
 	Time ret;
 	if (*this > other) {
 		ret.fset(this->_t.tv_sec - other._t.tv_sec, this->_t.tv_nsec - other._t.tv_nsec);
@@ -123,7 +123,7 @@ Time Time::absdiff(Time const& other) const {
 	return ret;
 }
 
-Time Time::time_elapsed(void) const {
+Time Time::time_elapsed(void) const noexcept {
 	return absdiff(Time{TIME_UTC});
 }
 
@@ -149,7 +149,7 @@ bool Time::carry_once_add(void) {
 	return false;
 }
 
-void Time::fset(time_t seconds, long nseconds) {
+void Time::fset(time_t seconds, long nseconds) noexcept {
 	_t.tv_sec = seconds;
 	_t.tv_nsec = nseconds;
 }
