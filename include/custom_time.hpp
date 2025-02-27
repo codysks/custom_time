@@ -44,6 +44,14 @@ class Time {
 		bool ffwdcmpnow(time_t seconds, long nseconds = 0) const;
 
 	private:
+/*
+ *  Unchecked variant of set. This may cause the state of the object
+ *  to become invalid without throwing any exceptions or indicate any
+ *  errors.
+ */
+		void fset(time_t second, long nseconds = 0);
+		bool carry_once_sub(void);
+		bool carry_once_add(void);
 		struct timespec _t;
 };
 
