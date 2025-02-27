@@ -109,3 +109,30 @@ Time& Time::set(Time&& t) { _t = t._t; return *this; }
 bool Time::ffwdcmpnow(time_t seconds, long nseconds) const {
 	return futureby(seconds, nseconds) > Time{TIME_UTC};
 }
+
+bool Time::carry_once_sub(void) {
+	if (_t.tv_nsec < nsecond_lower_bound) {
+		_t.tv_nsec += nsecond_to_second_ratio;
+		if (__builtin_sub_overflow(_t.tv_sec, 1, &_t.tv_sec)) {
+			throw std::exception();
+		}
+		return true;
+	}
+	return false;
+}
+
+bool Time::carry_once_add(void) {
+	if (_t.tv_nsec > nsecond_upper_bound) {
+		_t.tv_nsec -= nsecond_to_second_ratio;
+		if (__builtin_add_overflow(_t.tv_sec, 1, &_t.tv_sec)) {
+			throw std::exception();
+		}
+		return true;
+	}
+	return false;
+}
+
+void Time::fset(time_t seconds, long nseconds) {
+	_t.tv_sec = seconds;
+	_t.tv_nsec = nseconds;
+}
