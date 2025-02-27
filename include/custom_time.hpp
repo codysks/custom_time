@@ -43,6 +43,8 @@ class Time {
  */
 		bool ffwdcmpnow(time_t seconds, long nseconds = 0) const;
 
+		Time absdiff(Time const &other) const;
+
 	private:
 /*
  *  Unchecked variant of set. This may cause the state of the object

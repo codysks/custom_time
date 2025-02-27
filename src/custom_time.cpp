@@ -110,6 +110,19 @@ bool Time::ffwdcmpnow(time_t seconds, long nseconds) const {
 	return futureby(seconds, nseconds) > Time{TIME_UTC};
 }
 
+Time Time::absdiff(Time const& other) const {
+	Time ret;
+	if (*this > other) {
+		ret.fset(this->_t.tv_sec - other._t.tv_sec, this->_t.tv_nsec - other._t.tv_nsec);
+		ret.carry_once_sub();
+	} else {
+		ret.fset(other._t.tv_sec - this->_t.tv_sec, other._t.tv_nsec - this->_t.tv_nsec);
+		ret.carry_once_sub();
+	}
+
+	return ret;
+}
+
 bool Time::carry_once_sub(void) {
 	if (_t.tv_nsec < nsecond_lower_bound) {
 		_t.tv_nsec += nsecond_to_second_ratio;

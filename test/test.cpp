@@ -155,5 +155,19 @@ int main(void) {
 			nanosleep(&nsleepfor, nullptr);
 		}
 	}
+// Time arithmetic functions
+	{
+		++section; test_number = 0;
+		Time tbase{200, 500000000};
+		{
+		Time t1{100, 499999999};
+		assert(tbase.absdiff(t1) == Time(100, 1));
+		}
+		{
+		Time t1{100, 500000001};
+		assert(tbase.absdiff(t1) == Time(99, 999999999));
+		}
+
+	}
 	return EXIT_SUCCESS;
 }
